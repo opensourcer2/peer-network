@@ -11,8 +11,8 @@ npm install peer-network
 
 [![build status](http://img.shields.io/travis/mafintosh/peer-network.svg?style=flat)](http://travis-ci.org/mafintosh/peer-network)
 
-## Usage
-
+## Usage example
+### Simple
 First create a server
 
 ``` js
@@ -32,6 +32,48 @@ server.listen('echo-server') // listen on a name
 In another process (on any machine)
 
 ``` js
+// will connect to a server annoucing itself as echo-server
+var stream = network.connect('echo-server')
+
+stream.write('hello world')
+stream.on('data', function (data) {
+  console.log('data:', data.toString())
+})
+```
+
+### Custom bootstrap node
+First create a server
+
+``` js
+var peernet = require('peer-network')
+var opts = {
+  bootstrap: [
+    'router.bittorrent.com:6881'
+  ]
+}
+var network = peernet(opts)
+
+var server = network.createServer()
+
+server.on('connection', function (stream) {
+  console.log('new connection')
+  stream.pipe(stream) // echo
+})
+
+server.listen('echo-server') // listen on a name
+```
+
+In another process (on any machine)
+
+``` js
+var peernet = require('peer-network')
+var opts = {
+  bootstrap: [
+    'router.bittorrent.com:6881'
+  ]
+}
+var network = peernet(opts)
+
 // will connect to a server annoucing itself as echo-server
 var stream = network.connect('echo-server')
 
